@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assistance Client - Chatbot</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #6e8efb, #a777e3);
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background-color: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            margin-top: 20px;
+        }
+        
+        .header {
+            background: linear-gradient(to right, #4a6bff, #6e8efb);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .header h1 {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+        
+        .header p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        .status {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 5px 10px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+        
+        .status i {
+            color: #4cd964;
+            margin-right: 5px;
+        }
+        
+        .chat-container {
+            height: 400px;
+            padding: 15px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            background-color: #f8f9fa;
+        }
+        
+        .message {
+            max-width: 80%;
+            padding: 12px 15px;
+            border-radius: 20px;
+            line-height: 1.4;
+            position: relative;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .bot {
+            background-color: #e8eeff;
+            align-self: flex-start;
+            border-bottom-left-radius: 5px;
+        }
+        
+        .user {
+            background-color: #4a6bff;
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 5px;
+        }
+        
+        .time {
+            font-size: 0.7rem;
+            opacity: 0.7;
+            margin-top: 5px;
+            text-align: right;
+        }
+        
+        .input-area {
+            display: flex;
+            padding: 15px;
+            border-top: 1px solid #e0e0e0;
+            background-color: white;
+        }
+        
+        .input-area input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 24px;
+            outline: none;
+            font-size: 14px;
+        }
+        
+        .input-area button {
+            margin-left: 10px;
+            width: 50px;
+            height: 50px;
+            background-color: #4a6bff;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background-color 0.2s;
+        }
+        
+        .input-area button:hover {
+            background-color: #3a5bef;
+        }
+        
+        .suggestions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 15px;
+            background-color: white;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        .suggestion {
+            padding: 8px 15px;
+            background-color: #e8ebff;
+            border: none;
+            border-radius: 16px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .suggestion:hover {
+            background-color: #d5dcff;
+        }
+        
+        .typing {
+            display: none;
+            padding: 10px 15px;
+            color: #666;
+            font-style: italic;
+        }
+        
+        .share-section {
+            margin-top: 30px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+        }
+        
+        .share-section h3 {
+            margin-bottom: 15px;
+            color: #4a6bff;
+        }
+        
+        .share-btn {
+            display: inline-block;
+            margin: 10px 5px;
+            padding: 12px 20px;
+            background-color: #25D366;
+            color: white;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 8px rgba(37, 211, 102, 0.3);
+        }
+        
+        .share-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(37, 211, 102, 0.4);
+        }
+        
+        .whatsapp {
+            background-color: #25D366;
+        }
+        
+        .link {
+            background-color: #4a6bff;
+        }
+        
+        .footer {
+            margin-top: 20px;
+            color: white;
+            text-align: center;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                border-radius: 15px;
+            }
+            
+            .header {
+                padding: 15px;
+            }
+            
+            .header h1 {
+                font-size: 1.3rem;
+            }
+            
+            .chat-container {
+                height: 350px;
+            }
+            
+            .message {
+                max-width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Assistance Client</h1>
+            <p>Je suis là pour répondre à vos questions</p>
+            <div class="status">
+                <i class="fas fa-circle"></i> En ligne
+            </div>
+        </div>
+        
+        <div class="chat-container" id="chat">
+            <div class="message bot">
+                Bonjour ! 👋 Je suis l'assistant virtuel et je suis là pour répondre à vos questions en l'absence de l'équipe. Comment puis-je vous aider ?
+                <div class="time">Maintenant</div>
+            </div>
+        </div>
+        
+        <div class="typing" id="typing">
+            <i class="fas fa-circle"></i>
+            <i class="fas fa-circle"></i>
+            <i class="fas fa-circle"></i>
+        </div>
+        
+        <div class="suggestions">
+            <button class="suggestion" data-question="Quels sont vos horaires d'ouverture ?">Horaires</button>
+            <button class="suggestion" data-question="Comment puis-je suivre ma commande ?">Suivi commande</button>
+            <button class="suggestion" data-question="Quelles sont vos méthodes de paiement ?">Paiement</button>
+            <button class="suggestion" data-question="Comment vous contacter ?">Contact</button>
+        </div>
+        
+        <div class="input-area">
+            <input type="text" id="user-input" placeholder="Tapez votre message ici..." autocomplete="off">
+            <button id="send-btn">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+    
+    <div class="share-section">
+        <h3>Partager ce chatbot avec vos clients</h3>
+        <p>Utilisez ces boutons pour partager le chatbot via WhatsApp ou copier le lien</p>
+        <a href="#" class="share-btn whatsapp" id="whatsapp-share">
+            <i class="fab fa-whatsapp"></i> Partager sur WhatsApp
+        </a>
+        <a href="#" class="share-btn link" id="copy-link">
+            <i class="fas fa-link"></i> Copier le lien
+        </a>
+    </div>
+    
+    <div class="footer">
+        <p>Chatbot d'assistance client - Disponible 24/7</p>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const chatContainer = document.getElementById('chat');
+            const userInput = document.getElementById('user-input');
+            const sendBtn = document.getElementById('send-btn');
+            const typingIndicator = document.getElementById('typing');
+            const suggestionButtons = document.querySelectorAll('.suggestion');
+            const whatsappShare = document.getElementById('whatsapp-share');
+            const copyLink = document.getElementById('copy-link');
+            
+            // Base de connaissances du chatbot
+            const knowledgeBase = {
+                "salut": "Bonjour ! Comment puis-je vous aider aujourd'hui ?",
+                "bonjour": "Bonjour ! Comment puis-je vous aider aujourd'hui ?",
+                "hello": "Bonjour ! Comment puis-je vous aider aujourd'hui ?",
+                "coucou": "Bonjour ! Ravie de vous parler. Comment puis-je vous aider ?",
+                "bonsoir": "Bonsoir ! Comment puis-je vous aider ?",
+                
+                "horaires": "Nos horaires d'ouverture sont du lundi au vendredi de 9h à 18h, et le samedi de 10h à 16h.",
+                "horaire": "Nos horaires d'ouverture sont du lundi au vendredi de 9h à 18h, et le samedi de 10h à 16h.",
+                "ouvert": "Nous sommes ouverts du lundi au vendredi de 9h à 18h, et le samedi de 10h à 16h.",
+                "fermé": "Nous sommes fermés le dimanche. Nos horaires d'ouverture sont du lundi au vendredi de 9h à 18h, et le samedi de 10h à 16h.",
+                
+                "livraison": "Nous proposons plusieurs options de livraison : standard (3-5 jours), express (1-2 jours) et point relais.",
+                "livrer": "Nos délais de livraison dépendent de votre lieu de résidence. La livraison standard prend généralement 3 à 5 jours ouvrés.",
+                "expédition": "Nous traitons les commandes dans un délai de 24 à 48 heures. Ensuite, le délai de livraison dépend du mode choisi.",
+                
+                "paiement": "Nous acceptons les cartes bancaires (Visa, MasterCard), PayPal, et les virements bancaires.",
+                "payer": "Vous pouvez payer par carte bancaire, PayPal ou virement bancaire. Toutes nos transactions sont sécurisées.",
+                "carte bancaire": "Oui, nous acceptons les cartes Visa et MasterCard. Le paiement est sécurisé par chiffrement SSL.",
+                
+                "commande": "Pour suivre votre commande, veuillez consulter votre email où vous avez reçu votre numéro de suivi, ou connectez-vous à votre compte client.",
+                "suivi": "Vous pouvez suivre votre commande avec le numéro de suivi qui vous a été envoyé par email. Vous pouvez aussi vous connecter à votre compte client.",
+                
+                "retour": "Nous acceptons les retours sous 30 jours après réception. Les articles doivent être dans leur état d'origine et avec leur emballage.",
+                "remboursement": "Les remboursements sont traités sous 5 à 10 jours ouvrés après réception et inspection de l'article retourné.",
+                
+                "contact": "Vous pouvez nous contacter par email à support@votreentreprise.com ou par téléphone au 01 23 45 67 89 du lundi au vendredi de 9h à 18h.",
+                "téléphone": "Notre service client est joignable au 01 23 45 67 89 du lundi au vendredi de 9h à 18h.",
+                "email": "Notre adresse email est support@votreentreprise.com. Nous répondons généralement dans les 24 heures.",
+                
+                "urgence": "Pour les urgences, vous pouvez nous envoyer un email à urgent@votreentreprise.com et nous vous répondrons dès que possible.",
+                
+                "merci": "Je vous en prie ! N'hésitez pas si vous avez d'autres questions.",
+                "au revoir": "Au revoir ! N'hésitez pas à revenir si vous avez d'autres questions.",
+                "bye": "À bientôt ! N'hésitez pas à revenir si vous avez besoin d'aide.",
+                
+                "default": "Je ne suis pas sûr de comprendre. Pouvez-vous reformuler votre question ? Vous pouvez aussi poser une question sur nos horaires, livraisons, paiements ou suivis de commande."
+            };
+            
+            // Fonction pour ajouter un message au chat
+            function addMessage(text, isUser = false) {
+                const messageDiv = document.createElement('div');
+                messageDiv.classList.add('message');
+                messageDiv.classList.add(isUser ? 'user' : 'bot');
+                messageDiv.textContent = text;
+                
+                const timeDiv = document.createElement('div');
+                timeDiv.classList.add('time');
+                const now = new Date();
+                timeDiv.textContent = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                
+                messageDiv.appendChild(timeDiv);
+                chatContainer.appendChild(messageDiv);
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
+            
+            // Fonction pour simuler la frappe du chatbot
+            function showTypingIndicator() {
+                typingIndicator.style.display = 'block';
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
+            
+            function hideTypingIndicator() {
+                typingIndicator.style.display = 'none';
+            }
+            
+            // Fonction pour traiter la question de l'utilisateur
+            function processQuestion(question) {
+                // Ajouter la question de l'utilisateur
+                addMessage(question, true);
+                
+                // Nettoyer et mettre en minuscules la question
+                const cleanQuestion = question.toLowerCase().replace(/[^\w\s]/gi, '');
+                
+                // Simuler un délai de frappe
+                showTypingIndicator();
+                
+                setTimeout(() => {
+                    hideTypingIndicator();
+                    
+                    let response = knowledgeBase.default;
+                    
+                    // Chercher une correspondance dans la base de connaissances
+                    for (const [key, value] of Object.entries(knowledgeBase)) {
+                        if (cleanQuestion.includes(key)) {
+                            response = value;
+                            break;
+                        }
+                    }
+                    
+                    // Ajouter la réponse du chatbot
+                    addMessage(response);
+                }, 1000 + Math.random() * 1000); // Délai aléatoire entre 1 et 2 secondes
+            }
+            
+            // Événement pour le bouton d'envoi
+            sendBtn.addEventListener('click', function() {
+                const question = userInput.value.trim();
+                if (question) {
+                    processQuestion(question);
+                    userInput.value = '';
+                }
+            });
+            
+            // Événement pour la touche Entrée
+            userInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    const question = userInput.value.trim();
+                    if (question) {
+                        processQuestion(question);
+                        userInput.value = '';
+                    }
+                }
+            });
+            
+            // Événements pour les boutons de suggestion
+            suggestionButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const question = this.getAttribute('data-question');
+                    userInput.value = question;
+                    sendBtn.click();
+                });
+            });
+            
+            // Configuration du partage
+            const currentUrl = window.location.href;
+            const encodedUrl = encodeURIComponent(currentUrl);
+            const whatsappMessage = encodeURIComponent("Bonjour, vous pouvez contacter notre service client via ce chatbot : ");
+            
+            whatsappShare.href = `https://wa.me/?text=${whatsappMessage}${encodedUrl}`;
+            
+            // Copier le lien
+            copyLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                navigator.clipboard.writeText(currentUrl).then(() => {
+                    const originalText = copyLink.innerHTML;
+                    copyLink.innerHTML = '<i class="fas fa-check"></i> Lien copié !';
+                    setTimeout(() => {
+                        copyLink.innerHTML = originalText;
+                    }, 2000);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
